@@ -21,7 +21,7 @@ DeepVAC-face test dataset.
 |  目录   |  说明   |
 |---------|---------|
 |dataset  |数据集   |
-|code     |测试准确率的示例代码|
+|src     |测试示例代码|
 |dataset/db | 底库图片，包含多个子目录，默认合并使用|
 |dataset/db/famous | 底库图片，ds/famous测试图片对应的底库图片|
 |dataset/db/soccer | 底库图片，ds/soccer测试图片对应的底库图片|
