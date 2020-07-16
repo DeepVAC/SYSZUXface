@@ -29,8 +29,8 @@ git lfs pull
 
 ## 使用说明
 定义如下概念：
-- TP: 将正类预测为正类数，也即已注册db的ds 匹配到了 对应的db；
-- FN: 将正类预测为负类数；也即已注册db的ds 没有匹配 对应的db；
+- TP: 将正类预测为正类数；也即已注册db的ds 匹配到了 正确的db；
+- FN: 将正类预测为负类数；也即已注册db的ds 没有匹配 正确的db；分为FN_none和FN_err两种；
 - FP: 将负类预测为正类数；也即没注册db的ds 匹配到了 某个db；
 - TN: 将负类预测为负类数；也即没注册db的ds 没有匹配 任何db；
 
@@ -38,7 +38,7 @@ git lfs pull
 - 准确率(accuracy) = (TP+TN)/(TP+FN+FP+TN)
 - 精确率(precision) = TP/(TP+FP)
 - 召回率(recall) = TP/(TP+FN)
-- 漏检率(漏检率) = FN/(TP+FN)
+- 漏检率(漏检率) = FN_none/(TP+FN)，FN_none为FN中没有匹配到任何一个db图片的情况；
 - 错误率(错误率) = (FN+FP)/(TP+FN+FP+TN)
 
 项目的目录说明如下：
@@ -63,6 +63,33 @@ git lfs pull
 - 使用自定义人脸检测和识别算法，对ds的子目录进行检测、特征提取、底库特征匹配；
 - 计算ds/soccer的准确率、精确率、召回率、漏检率、错误率；
 - 计算ds/famous的准确率、精确率、召回率、漏检率、错误率；
+
+上述数据可以通过本项目示例代码中的Report模块来简化计算，下面是个示例：
+```python
+#use the Report class
+from lib.report import Report
+#total 5 images to test in gemfield dataset
+report = Report('gemfield',5)
+#add 5 predict records
+report.add("","2").add("1","1").add("1","1").add("1","1").add("1","1")
+#report.add(None,None)
+#report.add(None,"1")
+#report.add("1",None)
+#report.add("1","1")
+#report.add("1","2") #FN, special case....
+report()
+```
+程序会输出markdown格式的报告：
+```bash
+|dataset|total|duration|accuracy|precision|recall|miss|error|
+|--|--|--|--|--|--|--|--|
+|gemfield|5|0.000|0.8|0.8|1.0|0.0|0.2|
+```
+放入项目的md文件中，在web上会显示为：
+|dataset|total|duration|accuracy|precision|recall|miss|error|
+|--|--|--|--|--|--|--|--|
+|gemfield|5|0.000|0.8|0.8|1.0|0.0|0.2|
+
 
 ## 使用许可
 本项目仅限用于纯粹的学术研究，如：
