@@ -29,17 +29,17 @@ git lfs pull
 
 ## 使用说明
 定义如下概念：
-- TP: 将正类预测为正类数；也即已注册db的ds 匹配到了 正确的db；
-- FN: 将正类预测为负类数；也即已注册db的ds 没有匹配 正确的db；分为FN_none和FN_err两种；
-- FP: 将负类预测为正类数；也即没注册db的ds 匹配到了 某个db；
-- TN: 将负类预测为负类数；也即没注册db的ds 没有匹配 任何db；
+- TP: 预测结果大于阈值，且正确；也即已注册db的ds 匹配到了 正确的db；
+- FP: 预测结果大于阈值，且错误；也即没注册db的ds 匹配到了 某个db，或者已注册db的ds匹配到了错误的db；
+- TN: 预测结果小于阈值，且正确；也即没注册db的ds 没有匹配 任何db；
+- FN: 预测结果小于阈值，且错误；也即已注册db的ds 没有匹配 任何db；
 
 定义准确率、精确率、召回率如下：
-- 准确率(accuracy) = (TP+TN)/(TP+FN+FP+TN)
+- 准确率(accuracy) = (TP+TN)/(TP+FP+TN+FN)
 - 精确率(precision) = TP/(TP+FP)
 - 召回率(recall) = TP/(TP+FN)
-- 漏检率(漏检率) = FN_none/(TP+FN)，FN_none为FN中没有匹配到任何一个db图片的情况；
-- 错误率(错误率) = (FN+FP)/(TP+FN+FP+TN)
+- 漏检率(漏检率) = FN/(TP+FP+TN+FN)
+- 错误率(错误率) = (FP+FN)/(TP+FP+TN+FN)
 
 项目的目录说明如下：
 |  目录   |  说明   |
