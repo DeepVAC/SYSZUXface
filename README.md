@@ -71,7 +71,7 @@ from syszux_report import FaceReport
 #total 5 images to test in gemfield dataset
 report = FaceReport('gemfield',5)
 #add 5 predict records
-report.add("","2").add("1","1").add("1","1").add("1","1").add("1","1")
+report.add("","2").add("gemfield","gemfield").add(1,1).add(None,None).add("1","1")
 #report.add(None,None)
 #report.add(None,"1")
 #report.add("1",None)
@@ -83,12 +83,12 @@ report()
 ```bash
 |dataset|total|duration|accuracy|precision|recall|miss|error|
 |--|--|--|--|--|--|--|--|
-|gemfield|5|0.000|0.8|0.8|1.0|0.0|0.2|
+|gemfield|5|0.000|0.8|0.75|1.0|0.0|0.2|
 ```
 放入项目的md文件中，在web上会显示为：
 |dataset|total|duration|accuracy|precision|recall|miss|error|
 |--|--|--|--|--|--|--|--|
-|gemfield|5|0.000|0.8|0.8|1.0|0.0|0.2|
+|gemfield|5|0.000|0.8|0.75|1.0|0.0|0.2|
 
 
 ## 使用许可
