@@ -24,9 +24,10 @@ class ISFace(Deepvac):
         self.tensor_list = []
         self.torch_db_emb = torch.Tensor().to(self.device)
         self.idx_name_map = {}
-        LOG.log(LOG.S.I, "start load DEEPVAC-FACE DB...")
-#        self.loadDB()
-        LOG.log(LOG.S.I, "Load DEEPVAC-FACE DB finished...")
+        self.k = self.conf.top_k
+        LOG.logI("start load DEEPVAC-FACE DB...")
+        self.loadDB()
+        LOG.logI("Load DEEPVAC-FACE DB finished...")
 
     def initNetWithCode(self):
         #to initial self.net
@@ -46,7 +47,7 @@ class ISFace(Deepvac):
         names = []
         paths = []
         img_path_lists = self.getImgPathLists_(root)
-        LOG.log(LOG.S.I, "start make db, image count is {}".format(len(img_path_lists)) )
+        LOG.logI("start make db, image count is {}".format(len(img_path_lists)) )
         for idx, img_path in enumerate(img_path_lists):
             # time.sleep(1)
             emb = self.inference_(cv2.imread(os.path.join(root, img_path)))
@@ -56,14 +57,14 @@ class ISFace(Deepvac):
             names.append(img_path.strip().split('/')[-2])
             paths.append(img_path)
             if idx % 10000 == 0 and idx != 0:
-                LOG.log(LOG.S.I, "gen db features: {}".format(idx))
+                LOG.logI("gen db features: {}".format(idx))
         db_path = self.getConf().db_path
         db_dir = os.path.split(db_path)[0]
         if not os.path.exists(db_dir):
             os.makedirs(db_dir)
         torch.save(self.torch_db_emb, self.getConf().db_path)
         np.savez(self.getConf().np_path, names=names, paths=paths)
-        LOG.log(LOG.S.I, "gen db successful, save in {}".format(self.getConf().db_path))
+        LOG.logI("gen db successful, save in {}".format(self.getConf().db_path))
     
     def getImgPathLists_(self, root):
         img_path_lists = []
@@ -84,84 +85,25 @@ class ISFace(Deepvac):
             self.exportTorchViaTrace(img)
         return emb
 
-    def process(self):
-        #single image
-        if not isinstance(self.input_output['input'], list):
-            LOG.log(LOG.S.E, "illegal input of ISFace: {}".format(type(self.input_output['input'])))
-            return None
-        #currently only support single image
-        ex_time = 0
-        compare_total = 0
-        for ori in self.input_output['input']:
-            if type(ori).__module__ != np.__name__:
-                LOG.log(LOG.S.E, "illegal input of ISFace: {}".format(type(ori)))
-                return None
-            
-            if ori.shape != (112, 112, 3):
-                LOG.log(LOG.S.E, "illegal input shape: {}".format(ori.shape))
-                return None
-
-            start_time = time.time()
-            emb = self.inference_(ori).to('cuda')
-            elapsed_time = time.time() - start_time
-            ex_time += elapsed_time
-            LOG.log(LOG.S.I, "elapsed time of extract feature of ori {}".format(elapsed_time) )
-            
-            compare_start = time.time()
-            min_distance, min_index = self.compare_(emb)
-            compare_time = time.time() - compare_start
-            compare_total += compare_time
-            
-            if min_distance > self.getConf().threshold:
-                LOG.log(LOG.S.I, "Detected a stranger...")
-                continue
-            
-            name = self.db_names[min_index].split("_")[-1]
-            LOG.log(LOG.S.I, "Detected {}".format(name))
-            self.addOutput(name)
-
-        LOG.log(LOG.S.I, "Ext time {}".format(ex_time))
-        LOG.log(LOG.S.I, "Com time {}".format(compare_total))
-        return ex_time, compare_total
-
-    def compare_(self, emb):
-        print("gemfield compare: ", emb.type(),emb.shape,self.torch_db_emb.type(),self.torch_db_emb.shape )
-        distance = torch.norm(self.torch_db_emb - emb, dim=1)
-        print("distance: ",distance.type(), distance.shape)
-        min_index = torch.argmin(distance).item()
-        print("min_index: ",min_index)
-        return distance[min_index], min_index
-
-class DeepvacTopKTest(ISFace):
-    def __init__(self, deepvac_config):
-        super(DeepvacTopKTest, self).__init__(deepvac_config)
-        self.k = self.getConf().top_k
-
     def process(self, label):
         if not isinstance(self.input_output['input'], list):
-            LOG.log(LOG.S.E, "illegal input of ISFace: {}".format(type(self.input_output['input'])))
+            LOG.logE("illegal input of ISFace: {}".format(type(self.input_output['input'])))
             return None
-        ex_time = 0
-        comp_time = 0
+        
         for ori in self.input_output['input']:
             if type(ori).__module__ != np.__name__:
-                LOG.log(LOG.S.E, "illegal input of ISFace: {}".format(type(ori)))
+                LOG.logE("illegal input of ISFace: {}".format(type(ori)))
                 return None
             if ori.shape != (112, 112, 3):
-                LOG.log(LOG.S.E, "illegal input shape: {}".format(ori.shape))
+                LOG.logE("illegal input shape: {}".format(ori.shape))
                 return None
-            start_time = time.time()
+            
             emb = self.inference_(ori).to('cuda')
-            elapsed_time = time.time() - start_time
-            ex_time += elapsed_time
-            LOG.log(LOG.S.I, "elapsed time of extract feature of ori {}".format(elapsed_time) )
 
-            compare_start = time.time()
             topk_tups = self.compare_(emb)
-            comp_time += time.time() - compare_start
 
-            if topk_tups[0][1] > self.getConf().threshold:
-                LOG.log(LOG.S.I, "Detected a stranger...")
+            if topk_tups[0][1] > self.conf.threshold:
+                LOG.logI("Detected a stranger...")
                 continue
 
             name = self.db_names[topk_tups[0][0]]
@@ -169,13 +111,8 @@ class DeepvacTopKTest(ISFace):
                 if self.db_names[tup[0]] == label:
                     name = self.db_names[tup[0]]
             
-            LOG.log(LOG.S.I, "Detected {}".format(name))
+            LOG.logI("Detected {}".format(name))
             self.addOutput(name)
-
-        LOG.log(LOG.S.I, "Ext time {}".format(ex_time))
-        LOG.log(LOG.S.I, "Com time {}".format(comp_time))
-        
-        return ex_time, comp_time
 
     def compare_(self, emb):
         topk_tups = []
@@ -203,15 +140,12 @@ class DeepvacTopKTest(ISFace):
         dataset_path = self.getConf().dataset_path
         img_lists, img_paths = self.getImgPathsAndLists_(dataset_path)
         
-        total_extime = 0
-        total_comtime = 0
         report = FaceReport(database, len(img_lists))
         for i in range(len(img_lists)):
             label = img_paths[i].split('/')[-2]
             self.setInput(img_lists[i])
-            ex_time, com_time = self.process(label)
-            total_extime += ex_time
-            total_comtime += com_time
+            self.process(label)
+
             output = self.getOutput()
             if len(output) == 0:
                 pred = None                                                                            
@@ -220,22 +154,11 @@ class DeepvacTopKTest(ISFace):
             
             report.add(label, pred)
             
-        print('total_extime:', total_extime)
-        print('total_comtime:', total_comtime)
         report()
 
 
 if __name__ == "__main__":
     from conf import config as deepvac_config
-    deepvac_config.face.model_path = '/gemfield/hostpv/gemfield/deepvac-service/src/model/branch3_best.pth'
-    deepvac_config.face.db_path = '/gemfield/hostpv/gemfield/deepvac-service/src/db/deppvac_model_0825_9731.feature'
-    deepvac_config.face.np_path = '/gemfield/hostpv/gemfield/deepvac-service/src/db/deppvac_model_0825_9731.feature.npz'
-    deepvac_config.face.net_mode = 'ir'
-    deepvac_config.face.net_depth = 50
-    deepvac_config.face.database = "ipc"
-    deepvac_config.face.top_k = 5
-    deepvac_config.face.dataset_path = "/gemfield/hostpv/gemfield/val_dataset/" + deepvac_config.face.database + "/ds"
 
-    topK = DeepvacTopKTest(deepvac_config)
-    topK.loadDB()
+    topK = ISFace(deepvac_config)
     topK()
