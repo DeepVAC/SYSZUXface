@@ -107,7 +107,6 @@ class Backbone(Module):
         self.fc1 = Linear(512 * 7 * 7, embbedings)
         self.bn3 = BatchNorm1d(embbedings, affine=False)
 
-
     def makeLayers_(self, channel, depth, layers, stride):
         modules = []
         layer_block = self.block(channel, depth, layers, stride)

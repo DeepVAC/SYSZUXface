@@ -90,12 +90,11 @@ class ISFace(Deepvac):
         return emb
 
     def getPredName(self, D, I, label):
-        I = list(map(lambda x: self.db_names[x], I))
-
-        if label in I:
+        names = self.db_names[I]
+        if label in names:
             pred = label
         else:
-            pred = I[0]
+            pred = names[0]
         
         return pred
 
