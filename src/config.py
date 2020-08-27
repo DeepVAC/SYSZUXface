@@ -11,8 +11,8 @@ config.face.drop_ratio = 0.4
 
 config.face.db_img_path = '/gemfield/hostpv/gemfield/val_dataset/total_base/db'
 config.face.model_path = '/gemfield/hostpv/gemfield/deepvac-service/src/model/branch3_best.pth'
-config.face.db_path = '/gemfield/hostpv/gemfield/deepvac-service/src/db/deppvac_b3_test.feature'
-config.face.np_path = '/gemfield/hostpv/gemfield/deepvac-service/src/db/deppvac_b3_test.feature.npz'
+config.face.db_path = '/gemfield/hostpv/gemfield/deepvac-service/src/db/deppvac_b3_best.feature'
+config.face.np_path = '/gemfield/hostpv/gemfield/deepvac-service/src/db/deppvac_b3_best.feature.npz'
 
 config.face.net_mode = 'ir'
 config.face.net_depth = 50

@@ -107,7 +107,6 @@ class Backbone(Module):
         self.fc1 = Linear(512 * 7 * 7, embbedings)
         self.bn3 = BatchNorm1d(embbedings, affine=False)
 
-        self.initWeights_()
 
     def makeLayers_(self, channel, depth, layers, stride):
         modules = []
@@ -117,14 +116,6 @@ class Backbone(Module):
                             bottleneck.depth,
                             bottleneck.stride))
         return Sequential(*modules)
-
-    def initWeights_(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.xavier_normal_(m.weight)
-            elif isinstance(m, nn.Linear):
-                nn.init.xavier_normal_(m.weight)
-                nn.init.constant_(m.bias, 0)
 
     def forward(self,x):
         x = self.conv1(x)
