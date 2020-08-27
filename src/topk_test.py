@@ -1,5 +1,6 @@
 import sys
-sys.path.append("/your deepvac_path/")
+#sys.path.append("/your deepvac_path/")
+sys.path.append("/home/wangyuhang/deepvac")
 import cv2
 import os
 from PIL import Image
@@ -31,15 +32,15 @@ class ISFace(Deepvac):
 
     def initNetWithCode(self):
         #to initial self.net
-        conf = self.getConf()
+        conf = self.conf
         self.net = Backbone(conf.net_depth, conf.drop_ratio, conf.embedding_size, conf.net_mode)
 
     def initModelPath(self):
-        self.model_path = self.getConf().model_path
+        self.model_path = self.conf.model_path
 
     def loadDB(self):
-        face_db = np.load(self.getConf().np_path)
-        self.torch_db_emb = torch.load(self.getConf().db_path).to('cuda')
+        face_db = np.load(self.conf.np_path)
+        self.torch_db_emb = torch.load(self.conf.db_path).to('cuda')
         self.db_names = face_db['names']
         
     def makeDB(self, root):
@@ -58,13 +59,13 @@ class ISFace(Deepvac):
             paths.append(img_path)
             if idx % 10000 == 0 and idx != 0:
                 LOG.logI("gen db features: {}".format(idx))
-        db_path = self.getConf().db_path
+        db_path = self.conf.db_path
         db_dir = os.path.split(db_path)[0]
         if not os.path.exists(db_dir):
             os.makedirs(db_dir)
-        torch.save(self.torch_db_emb, self.getConf().db_path)
-        np.savez(self.getConf().np_path, names=names, paths=paths)
-        LOG.logI("gen db successful, save in {}".format(self.getConf().db_path))
+        torch.save(self.torch_db_emb, self.conf.db_path)
+        np.savez(self.conf.np_path, names=names, paths=paths)
+        LOG.logI("gen db successful, save in {}".format(self.conf.db_path))
     
     def getImgPathLists_(self, root):
         img_path_lists = []
@@ -85,9 +86,9 @@ class ISFace(Deepvac):
             self.exportTorchViaTrace(img)
         return emb
 
-    def getPredName(self, tups):
+    def getPredName(self, tups, label):
         name = self.db_names[tups[0][0]]
-        for tup in topk_tups[1:]:
+        for tup in tups[1:]:
             if self.db_names[tup[0]] == label:
                 name = self.db_names[tup[0]]
         return name
@@ -113,7 +114,7 @@ class ISFace(Deepvac):
                 LOG.logI("Detected a stranger...")
                 continue
 
-            name = getPredName(topk_tups)
+            name = self.getPredName(topk_tups, label)
             
             LOG.logI("Detected {}".format(name))
             self.addOutput(name)
@@ -140,8 +141,8 @@ class ISFace(Deepvac):
 
 
     def __call__(self):
-        database = self.getConf().database
-        dataset_path = self.getConf().dataset_path
+        database = self.conf.database
+        dataset_path = self.conf.dataset_path
         img_lists, img_paths = self.getImgPathsAndLists_(dataset_path)
         
         report = FaceReport(database, len(img_lists))
