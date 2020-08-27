@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/home/wangyuhang/wangyuhang/deepvac")
 import cv2
 import os
 from PIL import Image
