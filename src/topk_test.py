@@ -85,6 +85,13 @@ class ISFace(Deepvac):
             self.exportTorchViaTrace(img)
         return emb
 
+    def getPredName(self, tups):
+        name = self.db_names[tups[0][0]]
+        for tup in topk_tups[1:]:
+            if self.db_names[tup[0]] == label:
+                name = self.db_names[tup[0]]
+        return name
+
     def process(self, label):
         if not isinstance(self.input_output['input'], list):
             LOG.logE("illegal input of ISFace: {}".format(type(self.input_output['input'])))
@@ -106,10 +113,7 @@ class ISFace(Deepvac):
                 LOG.logI("Detected a stranger...")
                 continue
 
-            name = self.db_names[topk_tups[0][0]]
-            for tup in topk_tups[1:]:
-                if self.db_names[tup[0]] == label:
-                    name = self.db_names[tup[0]]
+            name = getPredName(topk_tups)
             
             LOG.logI("Detected {}".format(name))
             self.addOutput(name)
