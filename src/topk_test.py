@@ -1,6 +1,5 @@
 import sys
-#sys.path.append("/your deepvac_path/")
-sys.path.append("/home/wangyuhang/deepvac")
+sys.path.append("/your deepvac_path/")
 import cv2
 import os
 from PIL import Image
@@ -39,9 +38,21 @@ class ISFace(Deepvac):
         self.model_path = self.conf.model_path
 
     def loadDB(self):
+        if not self.conf.db_path:
+            LOG.logI('No db configured.')
+            return
+        if not self.conf.np_path:
+            LOG.logI('No np configured.')
+            return
+        super(ISFace,self).loadDB(self.conf.db_path)
         face_db = np.load(self.conf.np_path)
-        self.torch_db_emb = torch.load(self.conf.db_path).to('cuda')
+        self.torch_db_emb = self.xb
         self.db_names = face_db['names']
+
+    def addEmb2DB(self, emb):
+        if not self.conf.db_path:
+            LOG.logW('No db path configured.')
+        super(ISFace,self).addEmb2DB(emb)
         
     def makeDB(self, root):
         features = []
@@ -86,11 +97,18 @@ class ISFace(Deepvac):
             self.exportTorchViaTrace(img)
         return emb
 
-    def getPredName(self, tups, label):
-        name = self.db_names[tups[0][0]]
-        for tup in tups[1:]:
-            if self.db_names[tup[0]] == label:
-                name = self.db_names[tup[0]]
+    def addEmb2DB(self, emb):
+        if not self.conf.db_path:
+            LOG.logW('No db path configured.')
+        super(ISFace,self).addEmb2DB(emb)
+
+    def getPredName(self, D, I, label):
+        name = self.db_names[I[D.index(min(D))]]
+
+        for i in I[1:]:
+            if self.db_names[i] == label:
+                name = label
+        
         return name
 
     def process(self, label):
@@ -108,24 +126,16 @@ class ISFace(Deepvac):
             
             emb = self.inference_(ori).to('cuda')
 
-            topk_tups = self.compare_(emb)
+            D, I = self.search(emb, self.k)
 
-            if topk_tups[0][1] > self.conf.threshold:
+            if min(D) > self.conf.threshold:
                 LOG.logI("Detected a stranger...")
                 continue
-
-            name = self.getPredName(topk_tups, label)
+            
+            name = self.getPredName(D, I, label)
             
             LOG.logI("Detected {}".format(name))
             self.addOutput(name)
-
-    def compare_(self, emb):
-        topk_tups = []
-        distance = torch.norm(self.torch_db_emb - emb, dim=1)
-        for i in range(self.k):
-            val, index = distance.kthvalue(i+1)
-            topk_tups.append((index.item(), val.item()))
-        return topk_tups
 
     def getImgPathsAndLists_(self, dataset_path):
         img_lists = []
