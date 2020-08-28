@@ -2,11 +2,7 @@ import os
 import sys
 import cv2
 import numpy as np
-try:
-    from deepvac.syszux_log import LOG
-except:
-    print("You should add deepvac/lib path in PYTHONPATH or add sys.path.append(your_deepvac_path)")
-    sys.exit(1)
+from deepvac.syszux_log import LOG
 from deepvac.syszux_report import FaceReport
 from deepvac.syszux_executor import DeepvacChain
 from deepvac.syszux_loader import OsWalkerLoader
