@@ -12,8 +12,6 @@ from modules.model_retina import RetinaFace
 from deepvac.syszux_align import AlignFace
 from deepvac.syszux_deepvac import Deepvac
 from deepvac.syszux_log import LOG
-#Gemfield begin
-torch.set_grad_enabled(False)
 
 class RetinaDetect(Deepvac):
     def __init__(self, deepvac_config):
@@ -23,9 +21,6 @@ class RetinaDetect(Deepvac):
     def initNetWithCode(self):
         #to initial self.net
         self.net = RetinaFace(cfg=self.conf.net_structure[self.conf.network], phase = 'test')
-
-    def initModelPath(self):
-        self.model_path = self.conf.model_path
 
     def process(self):
         imglist_to_detect = []
