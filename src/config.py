@@ -9,10 +9,10 @@ config.face.input_size = [112,112]
 config.face.embedding_size = 512
 config.face.drop_ratio = 0.4
 
-config.face.db_img_path = '/gemfield/hostpv/gemfield/val_dataset/total_base/db'
-config.face.model_path = '/gemfield/hostpv/gemfield/deepvac-service/src/model/branch3_best.pth'
-config.face.db_path = '/gemfield/hostpv/gemfield/deepvac-service/src/db/deppvac_b3_best.feature'
-config.face.np_path = '/gemfield/hostpv/gemfield/deepvac-service/src/db/deppvac_b3_best.feature.npz'
+config.face.db_img_path = '/ your db img path / '
+config.face.model_path = '/ your face model path /'
+config.face.db_path = '/ your face feature path /'
+config.face.np_path = '/ your face np path /'
 
 config.face.net_mode = 'ir'
 config.face.net_depth = 50
@@ -20,9 +20,9 @@ config.face.net_depth = 50
 config.face.threshold = 1.3
 
 #### top_k test####
-config.face.database = 'ipc'
+config.face.database = 'your database name'
 config.face.top_k = 5
-config.face.dataset_path = '/gemfield/hostpv/gemfield/val_dataset/' + config.face.database + '/ds'
+config.face.dataset_path = '/ your test dataset path /'
 
 
 ################## detect begin ##############
@@ -38,7 +38,7 @@ config.detect.keep_top_k = 50
 config.detect.resize = 1
 
 config.detect.network = 'Resnet50' # 'mobilenet0.25' or 'Resnet50'
-config.detect.model_path = '/gemfield/hostpv/gemfield/deepvac-service/src/model/Resnet50_Final.pth' #/mobilenet0.25_Final.pth'
+config.detect.model_path = '/ your detect model path /'
 
 config.detect.cfg_mnet = {
     'name': 'mobilenet0.25',
@@ -88,6 +88,6 @@ config.detect.net_structure = {
 ################## dump begin ##############
 config.dumpimg = AttrDict()
 config.dumpimg.disable_git = True
-config.dumpimg.input_path = '/gemfield/hostpv/wangyuhang/new_train/CACD2000'
-config.dumpimg.output_path = '/gemfield/hostpv/wangyuhang/new_train_crop/CACD2000'
+config.dumpimg.input_path = '/ your input detect dataset path /'
+config.dumpimg.output_path = '/ your output detect dataset path /'
 config.dumpimg.file_var = None
