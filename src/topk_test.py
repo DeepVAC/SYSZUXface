@@ -10,7 +10,7 @@ from deepvac.syszux_deepvac import Deepvac
 from deepvac.syszux_log import LOG
 from deepvac.syszux_report import FaceReport
 from deepvac.syszux_loader import OsWalkerLoader
-from lib.isface.model import Backbone
+from modules.model_isface import Backbone
 
 class ISFace(Deepvac):
     def __init__(self, deepvac_config):

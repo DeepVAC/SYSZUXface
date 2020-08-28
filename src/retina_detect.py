@@ -8,7 +8,7 @@ import time
 from lib.layers.functions.prior_box import PriorBox
 from lib.nms.py_cpu_nms import py_cpu_nms
 from lib.box_utils import decode, decode_landm
-from lib.retina.models.retinaface import RetinaFace
+from modules.model_retina import RetinaFace
 from deepvac.syszux_align import AlignFace
 from deepvac.syszux_deepvac import Deepvac
 from deepvac.syszux_log import LOG
