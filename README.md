@@ -67,7 +67,7 @@ git lfs pull
 上述数据可以通过deepvac项目lib库的syszux_report模块来简化计算，下面是个示例：
 ```python
 #use the FaceReport class
-from syszux_report import FaceReport
+from deepvac.core.report import FaceReport
 #total 5 images to test in gemfield dataset
 report = FaceReport('gemfield',5)
 #add 5 predict records
