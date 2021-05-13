@@ -67,7 +67,7 @@ git lfs pull
 上述数据可以通过deepvac项目lib库的syszux_report模块来简化计算，下面是个示例：
 ```python
 #use the FaceReport class
-from syszux_report import FaceReport
+from deepvac import FaceReport
 #total 5 images to test in gemfield dataset
 report = FaceReport('gemfield',5)
 #add 5 predict records
@@ -90,7 +90,6 @@ report()
 |--|--|--|--|--|--|--|--|
 |gemfield|5|0.000|0.8|0.75|1.0|0.0|0.2|
 
-
 ## 使用许可
 本项目仅限用于纯粹的学术研究，如：
 - 个人学习；
@@ -108,3 +107,7 @@ report()
 - 提交自己的作品/产品在SYSZUXface上的成绩；
 - 发现和Fix项目的bug；
 - 提交高质量的测试集数据；
+
+## RetinaFace项目：
+RetinaFace项目实现了人脸检测，对齐，识别（包含制作底库），打印report的端到端流程，可以作为参考。
+具体情况请参考[RetinaFace](https://github.com/DeepVAC/RetinaFace)
